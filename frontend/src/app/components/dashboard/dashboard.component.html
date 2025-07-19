@@ -1,0 +1,183 @@
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+  <div class="header-content">
+    <h1 class="dashboard-title">EGD MDTS Dashboard</h1>
+    <div class="header-controls">
+      <div class="time-range-selector">
+        <label>Time Range:</label>
+        <select [(ngModel)]="selectedTimeRange" (change)="onTimeRangeChange()">
+          <option value="1h">Last Hour</option>
+          <option value="24h">Last 24 Hours</option>
+          <option value="7d">Last 7 Days</option>
+          <option value="30d">Last 30 Days</option>
+        </select>
+      </div>
+      <button class="refresh-btn" (click)="refreshDashboard()" [disabled]="isLoading">
+        <i class="fas fa-sync-alt" [class.spinning]="isLoading"></i>
+        Refresh
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" *ngIf="isLoading">
+  <div class="spinner"></div>
+  <p>Loading dashboard data...</p>
+</div>
+
+<!-- Dashboard Content -->
+<div class="dashboard-content" [class.loading]="isLoading">
+  
+  <!-- KPI Cards -->
+  <div class="kpi-section">
+    <div class="kpi-card" *ngFor="let kpi of kpiMetrics">
+      <div class="kpi-icon">
+        <i [class]="kpi.icon"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-value" [class]="kpi.trend">{{ kpi.value }}</h3>
+        <p class="kpi-label">{{ kpi.label }}</p>
+        <span class="kpi-change" [class]="kpi.changeType">
+          <i [class]="kpi.changeIcon"></i>
+          {{ kpi.change }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section">
+    
+    <!-- System Performance Chart -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>System Performance</h3>
+        <div class="chart-controls">
+          <button class="chart-btn" [class.active]="selectedMetric === 'cpu'" 
+                  (click)="selectMetric('cpu')">CPU</button>
+          <button class="chart-btn" [class.active]="selectedMetric === 'memory'" 
+                  (click)="selectMetric('memory')">Memory</button>
+          <button class="chart-btn" [class.active]="selectedMetric === 'disk'" 
+                  (click)="selectMetric('disk')">Disk</button>
+        </div>
+      </div>
+      <div class="chart-content">
+        <div class="chart-placeholder" *ngIf="!performanceData.length">
+          <i class="fas fa-chart-line"></i>
+          <p>No data available</p>
+        </div>
+        <canvas id="performanceChart" *ngIf="performanceData.length"></canvas>
+      </div>
+    </div>
+
+    <!-- Traffic Overview -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>Traffic Overview</h3>
+      </div>
+      <div class="chart-content">
+        <div class="chart-placeholder" *ngIf="!trafficData.length">
+          <i class="fas fa-network-wired"></i>
+          <p>No traffic data available</p>
+        </div>
+        <canvas id="trafficChart" *ngIf="trafficData.length"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Status Overview -->
+  <div class="status-section">
+    
+    <!-- Service Status -->
+    <div class="status-container">
+      <h3>Service Status</h3>
+      <div class="service-list">
+        <div class="service-item" *ngFor="let service of serviceStatus">
+          <div class="service-info">
+            <span class="service-name">{{ service.name }}</span>
+            <span class="service-version">v{{ service.version }}</span>
+          </div>
+          <div class="service-status" [class]="service.status.toLowerCase()">
+            <i [class]="getStatusIcon(service.status)"></i>
+            <span>{{ service.status }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Alerts -->
+    <div class="status-container">
+      <h3>Recent Alerts</h3>
+      <div class="alerts-list">
+        <div class="alert-item" *ngFor="let alert of recentAlerts" [class]="alert.severity.toLowerCase()">
+          <div class="alert-icon">
+            <i [class]="getAlertIcon(alert.severity)"></i>
+          </div>
+          <div class="alert-content">
+            <p class="alert-message">{{ alert.message }}</p>
+            <span class="alert-time">{{ alert.timestamp | date:'medium' }}</span>
+          </div>
+          <div class="alert-actions">
+            <button class="action-btn" (click)="acknowledgeAlert(alert.id)">
+              <i class="fas fa-check"></i>
+            </button>
+            <button class="action-btn" (click)="viewAlertDetails(alert.id)">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="no-alerts" *ngIf="!recentAlerts.length">
+          <i class="fas fa-shield-check"></i>
+          <p>No recent alerts</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Module Quick Links -->
+  <div class="quick-links-section">
+    <h3>Quick Access</h3>
+    <div class="quick-links-grid">
+      <div class="quick-link-card" 
+           *ngFor="let link of quickLinks" 
+           (click)="navigateToModule(link.route)"
+           [class]="link.status">
+        <div class="quick-link-icon">
+          <i [class]="link.icon"></i>
+        </div>
+        <div class="quick-link-content">
+          <h4>{{ link.title }}</h4>
+          <p>{{ link.description }}</p>
+          <span class="quick-link-status">{{ link.statusText }}</span>
+        </div>
+        <div class="quick-link-arrow">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Grafana Integration Section -->
+<div class="grafana-section" *ngIf="grafanaEnabled">
+  <div class="grafana-header">
+    <h3>Grafana Dashboards</h3>
+    <button class="grafana-btn" (click)="openGrafana()">
+      <i class="fab fa-grafana"></i>
+      Open Grafana
+    </button>
+  </div>
+  <div class="grafana-panels">
+    <iframe 
+      *ngFor="let panel of grafanaPanels"
+      [src]="panel.url" 
+      [title]="panel.title"
+      class="grafana-panel"
+      frameborder="0">
+    </iframe>
+  </div>
+</div>

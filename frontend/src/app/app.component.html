@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="portal-container">
+    <!-- Header -->
+    <header class="portal-header">
+      <div class="header-left">
+        <div class="angular-logo">
+          <img src="assets/images/angular-logo.png" alt="Angular" class="logo">
+          <span class="platform-title">Portal platform</span>
+        </div>
+        <div class="node-logo">
+          <img src="assets/images/nodejs-logo.png" alt="Node.js" class="logo">
+        </div>
+      </div>
+      
+      <div class="header-right">
+        <div class="user-management" *ngIf="currentUser">
+          <span class="user-name">{{ currentUser.name }}</span>
+          <button class="logout-btn" (click)="logout()">Logout</button>
+        </div>
+        <div class="keycloak-integration">
+          <img src="assets/images/keycloak-logo.png" alt="Keycloak" class="logo">
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="portal-main">
+      <div class="modules-grid">
+        
+        <!-- Master Data Management Module -->
+        <div class="module-card" (click)="navigateToModule('/master-data')">
+          <div class="module-header">
+            <h3>Master Data Mgmt</h3>
+          </div>
+          <div class="module-content">
+            <div class="tech-stack">
+              <img src="assets/images/spring-boot-logo.png" alt="Spring Boot" class="tech-logo">
+              <img src="assets/images/java-logo.png" alt="Java" class="tech-logo">
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboards Module -->
+        <div class="module-card" (click)="navigateToModule('/dashboards')">
+          <div class="module-header">
+            <h3>Dashboards</h3>
+          </div>
+          <div class="module-content">
+            <div class="tech-stack">
+              <img src="assets/images/grafana-logo.png" alt="Grafana" class="tech-logo">
+            </div>
+          </div>
+        </div>
+
+        <!-- Reporting Module -->
+        <div class="module-card" (click)="navigateToModule('/reporting')">
+          <div class="module-header">
+            <h3>Reporting</h3>
+          </div>
+          <div class="module-content">
+            <div class="tech-stack">
+              <img src="assets/images/superset-logo.png" alt="Superset" class="tech-logo">
+              <img src="assets/images/birt-logo.png" alt="BIRT" class="tech-logo">
+            </div>
+          </div>
+        </div>
+
+        <!-- Log Management Module -->
+        <div class="module-card" (click)="navigateToModule('/log-management')">
+          <div class="module-header">
+            <h3>Log management</h3>
+          </div>
+          <div class="module-content">
+            <div class="tech-stack">
+              <img src="assets/images/spring-boot-logo.png" alt="Spring Boot" class="tech-logo">
+              <img src="assets/images/java-logo.png" alt="Java" class="tech-logo">
+            </div>
+          </div>
+        </div>
+
+        <!-- Ticketing Module -->
+        <div class="module-card" (click)="navigateToModule('/ticketing')">
+          <div class="module-header">
+            <h3>Ticketing</h3>
+            <small>(inc. Outages, Chg. Requests)</small>
+          </div>
+          <div class="module-content">
+            <div class="tech-stack">
+              <img src="assets/images/mantis-logo.png" alt="Mantis" class="tech-logo">
+              <img src="assets/images/java-logo.png" alt="Java" class="tech-logo">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Router Outlet for Module Components -->
+    <router-outlet></router-outlet>
+  </div>
+</body>
+</html>
